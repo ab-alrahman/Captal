@@ -80,13 +80,14 @@ function validationLoginUser(obj) {
   return schema.validate(obj);
 }
 // validation Update User
-// function validationUpdateUser(obj) {
-//   const schema = Joi.object({
-//     username: Joi.string().trim().min(2).max(100),
-//     password: Joi.string().trim().min(8),
-//   });
-//   return schema.validate(obj);
-// }
+function validationUpdateUser(obj) {
+  const schema = Joi.object({
+  firstName: Joi.string().trim().min(3).max(100),
+  lastName: Joi.string().trim().min(3).max(100),
+  email: Joi.string().trim().min(3).max(100).email(),
+  });
+  return schema.validate(obj);
+}
 // Validate Code
 function validateCode(obj) {
   const schema = Joi.object({
@@ -112,5 +113,6 @@ module.exports = {
   User,
   validationLoginUser,
   validateCode,
-  generateOTP
+  generateOTP,
+  validationUpdateUser
 };

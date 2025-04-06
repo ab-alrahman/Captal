@@ -3,7 +3,7 @@ const { createOrderQualification, fileUpload,getAllOrder ,updateOrder,deleteOrde
 const photoUpload = require("../middlewares/photoUpload");
 const { verifyToken,verifyUser , verifyAuthorization } = require("../middlewares/verifyToken");
 const router = express.Router();
-const validId = require('../middlewares/validateId')
+const validId = require('../middlewares/validateId');
 
 // api/captal/order
 router.route("/").post(verifyToken, createOrderQualification).get(verifyToken,getAllOrder);

@@ -20,6 +20,7 @@ app.use(morgan('dev'))
 // Routes
 app.use("/api/captal/auth",require("./routes/auth"))
 app.use("/api/captal/order",require("./routes/order"))
+app.use("/api/captal/user",require("./routes/user"))
 
 
 // Error Handler middlewares

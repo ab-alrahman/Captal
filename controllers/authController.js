@@ -65,8 +65,6 @@ module.exports.login = asyncHandler(async (req, res) => {
  * @access Public
  */
 
-
-
 function generateOTP() {
   return crypto.randomInt(100000, 999999).toString();
 }
@@ -107,11 +105,9 @@ module.exports.verifyOTP = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "انتهت صلاحية الكود" });
   }
 
-  // حذف الكود بعد التحقق
   user.otp = undefined;
   await user.save();
 
-  // login: إصدار توكن JWT
   const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
     expiresIn: "7d"
   });
