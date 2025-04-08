@@ -26,7 +26,11 @@ const orderSchema = new mongoose.Schema({
     type:String,
     enum: ["AC", "NAC", "PEN"],
     default:"PEN"
-  }
+  },
+  description: {
+    type: String,
+    default: "Write Notes",
+  } 
 },
   {
     timestamps : true,
@@ -39,6 +43,7 @@ function validationOrderQualification(obj) {
     userId: Joi.string().required(),
     LastYearRevenue: Joi.string().required(),
     RequiredAmount: Joi.number().required(),
+    description: Joi.string().optional()
   })
   return schema.validate(obj);
 }

@@ -39,6 +39,7 @@ module.exports.createOrderQualification = asyncHandler(async (req, res) => {
     userId: user.id,
     LastYearRevenue: req.body.LastYearRevenue,
     RequiredAmount: req.body.RequiredAmount,
+    description: req.body.description
   });
 
   res.status(201).json({ message: "successfully", order });
@@ -143,6 +144,7 @@ module.exports.updateOrder = asyncHandler(async (req, res) => {
             $set : {
               LastYearRevenue: req.body.LastYearRevenue,
               RequiredAmount: req.body.RequiredAmount,
+              description: req.body.description
             }
         },{new:true});
         res.status(200).json(updatedorder);
