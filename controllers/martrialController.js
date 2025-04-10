@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const { validationMatrialsOrder, Matrials , validationUpdateMatrialsOrder} = require("../models/Materials");
-const { User } = require("../Models/User");
+const { User } = require("../models/User");
 const { upload } = require("../middlewares/photoUpload");
 
 
@@ -84,7 +84,7 @@ module.exports.updateMatrial = asyncHandler(async (req, res) => {
 
 /**
  * @desc Delete Matrial
- * @route /api/captal/order/:id
+ * @route /api/captal/matrial/:id
  * @method DELETE
  * @access private 
  */
@@ -99,3 +99,22 @@ module.exports.deleteMatrial = asyncHandler(async (req, res) => {
       DeleteMatrial
     });
 });
+
+/**
+ * @desc Update Status of Matrials order
+ * @route /api/captal/matrial/status/:id
+ * @method PUT
+ * @access private
+ */
+module.exports.updateStatus =asyncHandler(async(req ,res) =>{
+    const {error} = validationUpdateMatrialsOrder(req.body)
+    if(error){
+        return res.status(400).json({message : error.details[0].message}) 
+    }
+    const updatedstatus = await Order.findByIdAndUpdate(req.params.id,{
+        $set : {
+            status : req.body.status
+        }
+    },{new : true})
+    res.status(200).json(updatedstatus)
+})

@@ -12,7 +12,9 @@ const matrialSchema = new mongoose.Schema({
     required: true,
   },
   matrials: {
-  
+    type: Array,
+    required: true,
+    default: []
   },
   attachedFile: {
     type:Object,
@@ -20,6 +22,11 @@ const matrialSchema = new mongoose.Schema({
       publicId: null,
       url: ""
       }
+  },
+  status:{
+    type:String,
+    enum: ["Accepted", "Not Accepted", "Pending"],
+    default:"Pending"
   },
   description: {
     type: String,
@@ -52,7 +59,8 @@ function validationUpdateMatrialsOrder(obj) {
         quantity: Joi.string().required()
       })
     ),
-    description: Joi.string()
+    description: Joi.string(),
+    status: Joi.string(),
   })
   return schema.validate(obj);
 }

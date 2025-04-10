@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const { validationOrderQualification, Order, validationUpdateOrderQualification } = require("../models/Order");
-const { User } = require("../Models/User");
+const { User } = require("../models/User");
 const { upload } = require("../middlewares/photoUpload");
 
 
