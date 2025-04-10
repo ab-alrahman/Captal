@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { validationOrderQualification, Order, validationUpdateOrderQualification } = require("../models/Order");
+const { validationOrderQualification, Order, validationUpdateOrderQualification } = require("../models/OrderQualification");
 const { User } = require("../models/User");
 const { upload } = require("../middlewares/photoUpload");
 
@@ -16,7 +16,7 @@ module.exports.createOrderQualification = [
   asyncHandler(async (req, res) => {
     const { error } = validationOrderQualification(req.body);
     if (error) {
-      return res.status(400).json({ message: error.details[0].message });
+      return res.status(400).json({ message: error.details[0].message }); 
     }
     const user = await User.findById(req.user.id);
     if (!user) {

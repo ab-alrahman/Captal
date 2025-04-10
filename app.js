@@ -19,9 +19,9 @@ app.use(morgan('dev'))
 
 // Routes
 app.use("/api/captal/auth",require("./routes/auth"))
-app.use("/api/captal/order",require("./routes/order"))
+app.use("/api/captal/order",require("./routes/orderQualification"))
 app.use("/api/captal/user",require("./routes/user"))
-app.use("/api/captal/matrial",require("./routes/matrials"))
+app.use("/api/captal/matrial",require("./routes/matrialsOrder"))
 
 
 // Error Handler middlewares

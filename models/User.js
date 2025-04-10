@@ -46,29 +46,24 @@ const userSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-    otp: {
-      code: String,
-      expiresAt: Date
-    },
+    // otp: {
+    //   code: String,
+    //   expiresAt: Date
+    // },
     role: {
       type: String,
-      enum: ["Admin", "Contractor", "Provider"],
+      enum: ["admin", "contractor", "recourse"],
     },
-    verfied: {
+    // verfied: {
       
-    },
-    status: {
-      type: String,
-      enum: ["visitor", "qualified"],
-      default:"visitor"
-    }
+    // },
   },
   {
     timestamps : true,
   }
 );
 // validation Register User
-function validationLoginUser(obj) {
+function validationLoginAndCreateUser(obj) {
   const schema = Joi.object({
     firstName: Joi.string().trim().min(3).max(100).required(),
     lastName: Joi.string().trim().min(3).max(100).required(),
@@ -76,10 +71,11 @@ function validationLoginUser(obj) {
     companyName: Joi.string().trim().min(3).max(100).required(),
     DateOfCompany: Joi.date().required(),
     email: Joi.string().trim().min(3).max(100).required().email(),
-    role: Joi.string().required()
+    role: Joi.string().valid("contractor","recourse","admin").required()
   });
   return schema.validate(obj);
 }
+
 // validation Update User
 function validationUpdateUser(obj) {
   const schema = Joi.object({
@@ -89,6 +85,7 @@ function validationUpdateUser(obj) {
   });
   return schema.validate(obj);
 }
+
 // Validate Code
 function validateCode(obj) {
   const schema = Joi.object({
@@ -112,8 +109,8 @@ function generateOTP() {
 const User = mongoose.model("User", userSchema);
 module.exports = {
   User,
-  validationLoginUser,
+  validationLoginAndCreateUser,
+  validationUpdateUser,
   validateCode,
   generateOTP,
-  validationUpdateUser
 };

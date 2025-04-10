@@ -1,6 +1,44 @@
 const asyncHandler = require("express-async-handler")
-const bcrypt=require("bcryptjs")
-const{User,validationUpdateUser} = require("../Models/User")
+const{User,validationUpdateUser, validationLoginAndCreateUser} = require("../models/User")
+const jwt = require("jsonwebtoken");
+
+/**
+ * @desc Create User 
+ * @route /api/users/
+ * @method POST
+ * @access private
+ */
+
+const createUser = asyncHandler(async (req, res) => {
+    const { error } = validationLoginAndCreateUser(req.body);
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+    }
+    const { email, phone, firstName, lastName, companyName, DateOfCompany, role } = req.body;
+    const user = await User.create({
+        email,
+        firstName,
+        lastName,
+        phone,
+        companyName,
+        DateOfCompany,
+        role
+    });
+
+    res.status(201).json({
+        message: "تم التسجيل بنجاح",
+        user: {
+            _id: user._id,
+            email: user.email,
+            phone: user.phone,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            companyName: user.companyName,
+            DateOfCompany: user.DateOfCompany,
+            role: user.role
+        }
+    });
+})
 
 /**
  * @desc Update User 
@@ -8,6 +46,7 @@ const{User,validationUpdateUser} = require("../Models/User")
  * @method PUT
  * @access private
  */
+
 const updateUser = asyncHandler(async (req, res) => {
     const { email, firstName, lastName } = req.body;
     if(req.user.id != req.params.id){
@@ -74,5 +113,6 @@ module.exports = {
     updateUser,
     getAllUsers,
     getUserByID,
-    deleteUser
+    deleteUser,
+    createUser
 }

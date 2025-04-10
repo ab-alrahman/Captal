@@ -1,5 +1,5 @@
 const express = require("express");
-const { createOrderQualification ,getAllOrder ,updateOrder,deleteOrder,getOrderById,updateStatus} = require("../controllers/orderController");
+const { createOrderQualification ,getAllOrder ,updateOrder,deleteOrder,getOrderById,updateStatus} = require("../controllers/orderQualificationController");
 const { verifyToken,verifyUser} = require("../middlewares/verifyToken");
 const router = express.Router();
 const validId = require('../middlewares/validateId');

@@ -3,8 +3,8 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const {
   User,
-  validationLoginUser,
-} = require("../Models/User");
+  validationLoginAndCreateUser,
+} = require("../models/User");
 
 /**
  * @desc Login New User
@@ -14,7 +14,7 @@ const {
  */
 
 module.exports.login = asyncHandler(async (req, res) => {
-  const { error } = validationLoginUser(req.body);
+  const { error } = validationLoginAndCreateUser(req.body);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
@@ -39,7 +39,14 @@ module.exports.login = asyncHandler(async (req, res) => {
   await user.save();
 
   const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
-    expiresIn: "7d"
+    expiresIn: "30d"
+  });
+  const Cookies = res.cookie("captalToken", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 30 * 1000,
   });
 
   res.status(201).json({
@@ -54,7 +61,8 @@ module.exports.login = asyncHandler(async (req, res) => {
       DateOfCompany: user.DateOfCompany,
       role: user.role
     },
-    token
+    token,
+    Cookies
   });
 });
 

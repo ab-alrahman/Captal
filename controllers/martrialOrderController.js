@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { validationMatrialsOrder, Matrials , validationUpdateMatrialsOrder} = require("../models/Materials");
+const { validationMatrialsOrder, Matrials , validationUpdateMatrialsOrder} = require("../models/MaterialsOrder");
 const { User } = require("../models/User");
 const { upload } = require("../middlewares/photoUpload");
 
