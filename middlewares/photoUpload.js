@@ -1,23 +1,26 @@
-const path = require("path")
-const multer = require("multer")
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const cloudinary = require('cloudinary').v2;
-const { cloudinaryUploudImage, cloudinaryRemoveImage } = require("../utils/cloudinary");
+const path = require("path");
+const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("cloudinary").v2;
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: "Univers",
-    allowed_formats: ["jpg", "png", "jpeg", "mp4", "avi", "mov"],
-    public_id: (req, file) => `${Date.now()}_${file.originalname}`,
-    format: "jpg",
-    quality: "auto:good",
+  cloudinary,
+  params: async (req, file) => {
+    return {
+      folder: "Univers",
+      public_id: `${Date.now()}_${file.originalname.split('.')[0]}`,
+      resource_type: "auto", 
+      allowed_formats: ["jpg", "jpeg", "png", "mp4", "avi", "mov"],
+    };
   },
 });
 
-
 const upload = multer({ storage }).single("attachedFile");
 
-module.exports = {
-  upload
-}
+module.exports = upload;

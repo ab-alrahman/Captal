@@ -1,11 +1,10 @@
 const express = require("express")
 const router = express.Router()
-const { login, requestOTP, verifyOTP } = require ("../controllers/authController")
+const { sendOTP,verifyOTP } = require("../controllers/authController")
 
-// /api/captal/auth/login
-router.post("/login", login);
-// /api/captal/auth/login/codeOTP
-router.post("/login/codeOTP", requestOTP);
-// /api/captal/auth/login/verfiyOTP
-router.post("/login/verfiyOTP", verifyOTP);
+
+// /api/captal/auth/send-otp
+router.post("/send-otp", sendOTP);
+// /api/captal/auth/verify-otp
+router.post("/verify-otp", verifyOTP);
 module.exports = router

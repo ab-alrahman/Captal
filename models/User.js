@@ -23,8 +23,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      minlength: 13,
-      maxlength: 13,
+      length: 10,
       unique: true,
     },
     email: {
@@ -46,10 +45,20 @@ const userSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-    // otp: {
-    //   code: String,
-    //   expiresAt: Date
-    // },
+    attachedFile: {
+      type:Object,
+      default: {
+        publicId: null,
+        url: ""
+        }
+    },
+    otp: {
+      type: String,
+      length: 6
+    },
+    expiresAt: {
+      type: Date,
+    },
     role: {
       type: String,
       enum: ["admin", "contractor", "recourse"],
@@ -62,16 +71,24 @@ const userSchema = new mongoose.Schema(
     timestamps : true,
   }
 );
-// validation Register User
+// validation Login User
 function validationLoginAndCreateUser(obj) {
   const schema = Joi.object({
     firstName: Joi.string().trim().min(3).max(100).required(),
     lastName: Joi.string().trim().min(3).max(100).required(),
-    phone: Joi.string().trim().min(13).max(13).required(),
+    phone: Joi.string().trim().length(10).required(),
     companyName: Joi.string().trim().min(3).max(100).required(),
     DateOfCompany: Joi.date().required(),
     email: Joi.string().trim().min(3).max(100).required().email(),
     role: Joi.string().valid("contractor","recourse","admin").required()
+  });
+  return schema.validate(obj);
+}
+
+// validation Login User
+function validationLoginUser(obj) {
+  const schema = Joi.object({
+    phone: Joi.string().trim().length(10).required(),
   });
   return schema.validate(obj);
 }
@@ -113,4 +130,5 @@ module.exports = {
   validationUpdateUser,
   validateCode,
   generateOTP,
+  validationLoginUser
 };

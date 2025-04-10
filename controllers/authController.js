@@ -1,131 +1,88 @@
 const asyncHandler = require("express-async-handler");
-const jwt = require("jsonwebtoken");
+const generateToken = require('../utils/token')
 const crypto = require("crypto");
 const {
   User,
-  validationLoginAndCreateUser,
+  validationLoginUser,
 } = require("../models/User");
 
+// generate OTP CODE 
+
+const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
+
+
 /**
- * @desc Login New User
- * @route /api/captal/auth/login
- * @method POST
+ * @desc  Generate OTP and send it to the user
+ * @route POST => /api/captal/auth/send-otp
  * @access Public
  */
 
-module.exports.login = asyncHandler(async (req, res) => {
-  const { error } = validationLoginAndCreateUser(req.body);
-  if (error) {
-    return res.status(400).json({ message: error.details[0].message });
+const sendOTP = asyncHandler(
+  async (req, res) => {
+    const { phone } = req.body;
+    if (!phone) return res.status(400).json({ message: 'رقم الهاتف مطلوب' });
+  
+    const otp = generateOTP();
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  
+    let user = await User.findOne({ phone });
+  
+    if (!user) {
+      user = await User.create({ phone, otp, expiresAt });
+    } else {
+      user.otp = otp;
+      user.expiresAt = expiresAt;
+      await user.save();
+    }
+  
+    console.log(`📲 OTP for ${phone}: ${otp}`);
+    res.json({ message: 'تم إرسال الكود بنجاح' });
+  }
+) 
+
+/**
+ * @desc  Verify OTP and login the user, return JWT in cookie
+ * @route POST => /api/captal/auth/verify-otp
+ * @access Public
+ */
+
+const verifyOTP = asyncHandler(async (req, res) => {
+  const { phone, otp } = req.body;
+  const user = await User.findOne({ phone });
+  
+  if (!user || user.otp !== otp) {
+    return res.status(400).json({ message: 'كود التحقق غير صحيح' });
   }
 
-  const { email, phone, firstName, lastName, companyName, DateOfCompany, role } = req.body;
-
-  let user = await User.findOne({ phone });
-  if (user) {
-    return res.status(400).json({ message: "user already exists" });
+  if (user.expiresAt < new Date()) {
+    return res.status(400).json({ message: 'انتهت صلاحية الكود' });
   }
 
-  user = new User({
-    email,
-    firstName,
-    lastName,
-    phone,
-    companyName,
-    DateOfCompany,
-    role
-  });
-
+  user.otp = null;
+  user.expiresAt = null;
   await user.save();
 
-  const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
-    expiresIn: "30d"
-  });
-  const Cookies = res.cookie("captalToken", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 30 * 1000,
+  const token = generateToken(user);
+
+  res.cookie('token', token, {
+    httpOnly: true, 
+    secure: process.env.NODE_ENV === 'production', 
+    sameSite: 'strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
-  res.status(201).json({
-    message: "تم التسجيل بنجاح",
+  res.json({
+    message: 'تم تسجيل الدخول بنجاح',
     user: {
       _id: user._id,
-      email: user.email,
       phone: user.phone,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      companyName: user.companyName,
-      DateOfCompany: user.DateOfCompany,
-      role: user.role
-    },
-    token,
-    Cookies
-  });
-});
-
-/**
- * @desc Generate code OTP
- * @route /api/captal/auth/login/code
- * @method POST
- * @access Public
- */
-
-function generateOTP() {
-  return crypto.randomInt(100000, 999999).toString();
-}
-
-module.exports. requestOTP = asyncHandler(async (req, res) => {
-  const { phone } = req.body;
-
-  if (!phone) {
-    return res.status(400).json({ message: "يرجى إدخال رقم الهاتف" });
-  }
-
-  const otpCode = generateOTP();
-  const expires = new Date(Date.now() + 5 * 60 * 1000);
-
-  const user = await User.findOne({ phone });
-  if (!user) {
-    user = await User.create({ phone });
-  }
-
-  user.otp = { code: otpCode, expiresAt: expires };
-  await user.save();
-
-  console.log(`OTP for ${phone}: ${otpCode}`);
-
-  res.status(200).json({ message: "تم إرسال كود التحقق" });
-});
-
-module.exports.verifyOTP = asyncHandler(async (req, res) => {
-  const { phone, otp } = req.body;
-
-  const user = await User.findOne({ phone });
-
-  if (!user || !user.otp || user.otp.code !== otp) {
-    return res.status(400).json({ message: "كود التحقق غير صحيح" });
-  }
-
-  if (user.otp.expiresAt < new Date()) {
-    return res.status(400).json({ message: "انتهت صلاحية الكود" });
-  }
-
-  user.otp = undefined;
-  await user.save();
-
-  const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
-    expiresIn: "7d"
-  });
-
-  res.status(200).json({
-    message: "تم تسجيل الدخول بنجاح",
-    token,
-    user: {
-      id: user._id,
-      phone: user.phone
     }
   });
-});
+}
+)
+
+
+module.exports = {
+  verifyOTP,
+  sendOTP
+}
