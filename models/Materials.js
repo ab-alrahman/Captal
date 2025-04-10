@@ -12,9 +12,14 @@ const matrialSchema = new mongoose.Schema({
     required: true,
   },
   matrials: {
-    type: Array,
-    required: true,
-    default: []
+  
+  },
+  attachedFile: {
+    type:Object,
+    default: {
+      publicId: null,
+      url: ""
+      }
   },
   description: {
     type: String,

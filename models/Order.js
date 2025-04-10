@@ -24,8 +24,8 @@ const orderSchema = new mongoose.Schema({
   },
   status:{
     type:String,
-    enum: ["AC", "NAC", "PEN"],
-    default:"PEN"
+    enum: ["Accepted", "Not Accepted", "Pending"],
+    default:"Pending"
   },
   description: {
     type: String,

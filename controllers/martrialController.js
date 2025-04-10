@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const { validationMatrialsOrder, Matrials , validationUpdateMatrialsOrder} = require("../models/Materials");
 const { User } = require("../Models/User");
+const { upload } = require("../middlewares/photoUpload");
 
 
 /**
@@ -10,20 +11,27 @@ const { User } = require("../Models/User");
  * @access private
  */
 
-module.exports.createMatrial = asyncHandler(async (req, res) => {
+module.exports.createMatrial = [
+  upload,
+  asyncHandler(async (req, res) => {
   const { error } = validationMatrialsOrder(req.body);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
-  }
+    }
+    const uploadedFile = req.file
+    ? { url: req.file.path, publicId: req.file.filename }
+    : { url: "null", publicId: "null" };
     const user = await User.findById(req.user.id);
     const matrials = await Matrials.create({
       userId: user.id,
       serialNumber: req.body.serialNumber,
       matrials: req.body.matrials,
-      description: req.body.description
+      description: req.body.description,
+      attachedFile: uploadedFile
     });
     res.status(201).json({ message: "successfully", matrials });
-})
+  })
+]
 
 /**
  * @desc Get Matrial Order  

@@ -1,9 +1,8 @@
 const asyncHandler = require("express-async-handler");
 const { validationOrderQualification, Order, validationUpdateOrderQualification } = require("../models/Order");
 const { User } = require("../Models/User");
-const fs = require("fs");
-const path = require("path");
-const { cloudinaryUploudImage, cloudinaryRemoveImage } = require("../utils/cloudinary");
+const { upload } = require("../middlewares/photoUpload");
+
 
 /**
  * @desc Create Order Qualification 
@@ -11,95 +10,32 @@ const { cloudinaryUploudImage, cloudinaryRemoveImage } = require("../utils/cloud
  * @method POST
  * @access private
  */
-module.exports.createOrderQualification = asyncHandler(async (req, res) => {
-  // if (!req.user || !req.user.id) {
-  //   return res.status(401).json({ message: "Unauthorized" });
-  // }
 
-  // if (!req.file) {
-  //   return res.status(400).json({ message: "يرجى إرفاق ملف" });
-  // }
-  //   const imagePath = path.join(__dirname, `../images/${req.file.filename}`);
-  // const result = await cloudinaryUploudImage(imagePath);
-  // const fileData = {
-  //   publicId: result.public_id,
-  //   url: result.secure_url
-  // };
-
-  // fs.unlinkSync(req.file.path);
-
-  const { error } = validationOrderQualification(req.body);
-  if (error) {
-    return res.status(400).json({ message: error.details[0].message });
-  }
-
-  const user = await User.findById(req.user.id);
-
-  const order = await Order.create({
-    userId: user.id,
-    LastYearRevenue: req.body.LastYearRevenue,
-    RequiredAmount: req.body.RequiredAmount,
-    description: req.body.description
-  });
-
-  res.status(201).json({ message: "successfully", order });
-});
-
-/**
- * @desc file Upload
- * @route /api/captal/order/:id/file-upload
- * @method POST
- * @access private (only logged in user)
- */
-
-module.exports.fileUpload = asyncHandler(async (req, res) => {
-  // 1- Validation
-  if (!req.file) {
-    return res.status(400).json({ message: "No file provided" });
-  }
-
-  // 2- Get the image path
-  const imagePath = path.join(__dirname, `../images/${req.file.filename}`);
-
-  // 3- Upload to Cloudinary
-  const result = await cloudinaryUploudImage(imagePath);
-
-  // 4- Get the order ID (ensure you're passing orderId in params or body)
-  const orderId = req.params.id || req.body.orderId;
-  if (!orderId) {
-    return res.status(400).json({ message: "Order ID is required" });
-  }
-
-  const order = await Order.findById(orderId);
-  if (!order) {
-    return res.status(404).json({ message: "Order not found" });
-  }
-
-  // 5- Remove old file from Cloudinary if exists
-  if (order.attachedFile && order.attachedFile.publicId) {
-    await cloudinaryRemoveImage(order.attachedFile.publicId);
-  }
-
-  // 6- Update order with new file
-  order.attachedFile = {
-    publicId: result.public_id,
-    url: result.secure_url
-  };
-  await order.save();
-
-  // 7- Respond to client
-  res.status(200).json({
-    message: "Your file uploaded successfully",
-    attachedFile: {
-      publicId: result.public_id,
-      url: result.secure_url
+module.exports.createOrderQualification = [
+  upload,
+  asyncHandler(async (req, res) => {
+    const { error } = validationOrderQualification(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
     }
-  });
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const uploadedFile = req.file
+      ? { url: req.file.path, publicId: req.file.filename }
+      : { url: "null", publicId: "null" };
+    const order = await Order.create({
+      userId: user.id,
+      LastYearRevenue: req.body.LastYearRevenue,
+      RequiredAmount: req.body.RequiredAmount,
+      description: req.body.description,
+      attachedFile: uploadedFile,
+    });
 
-  // 8- Remove file from server
-  fs.unlinkSync(imagePath);
-});
-
+    res.status(201).json({ message: "Successfully created order", order });
+  }),
+];
 
 /**
  * @desc Get All Order

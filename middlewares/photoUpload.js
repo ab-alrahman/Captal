@@ -1,37 +1,23 @@
 const path = require("path")
-const multer = require ("multer")
+const multer = require("multer")
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('cloudinary').v2;
+const { cloudinaryUploudImage, cloudinaryRemoveImage } = require("../utils/cloudinary");
 
-// Photo Storage
-const photoStorage = multer.diskStorage({
-    destination : function(req , file ,cb) {
-        cb (null , path.join(__dirname , "../images"))
-    },
-    filename : function(req, file ,cb){
-        if (file){
-            cb (null , new Date().toISOString().replace(/:/g,"-")+file.originalname)
-        } else {
-            cb (null ,false)
-        }
-    }
-})
-const allowedMimeTypes = [
-    "image/jpeg",
-    "image/png",
-    "application/pdf",
-    "application/msword",               // .doc
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document" // .docx
-];
-// Photo Upload Middleware
-const photoUpload = multer({
-    storage : photoStorage ,
-    fileFilter : function (req , file , cb){
-        if(allowedMimeTypes.includes(file.mimetype)){
-            cb(null , true)
-        } else {
-            cb({meassage : "Unsupported file format"} , false)
-        }
-    },
-    limits : { fieldSize :5* 1024 * 1024 }
-})
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "Univers",
+    allowed_formats: ["jpg", "png", "jpeg", "mp4", "avi", "mov"],
+    public_id: (req, file) => `${Date.now()}_${file.originalname}`,
+    format: "jpg",
+    quality: "auto:good",
+  },
+});
 
-module.exports = photoUpload
+
+const upload = multer({ storage }).single("attachedFile");
+
+module.exports = {
+  upload
+}

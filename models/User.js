@@ -52,14 +52,15 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["Admin", "Contractor", "Supplier"],
-    },
-    isAdmin: {
-      type: Boolean,
-      default:false
+      enum: ["Admin", "Contractor", "Provider"],
     },
     verfied: {
       
+    },
+    status: {
+      type: String,
+      enum: ["visitor", "qualified"],
+      default:"visitor"
     }
   },
   {
