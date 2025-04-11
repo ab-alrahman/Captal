@@ -16,11 +16,11 @@ const storage = new CloudinaryStorage({
       folder: "Univers",
       public_id: `${Date.now()}_${file.originalname.split('.')[0]}`,
       resource_type: "auto", 
-      allowed_formats: ["jpg", "jpeg", "png", "mp4", "avi", "mov"],
+      allowed_formats: ["jpg", "jpeg", "png", "mp4", "avi", "mov", "pdf"],
     };
   },
 });
 
 const upload = multer({ storage }).single("attachedFile");
 
-module.exports = upload;
+module.exports = upload; 

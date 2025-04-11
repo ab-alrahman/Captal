@@ -21,7 +21,8 @@ app.use(cookieParser());
 
 // Routes
 app.use("/api/captal/auth",require("./routes/auth"))
-// app.use("/api/captal/order",require("./routes/orderQualification"))
+app.use("/api/captal/orderQualification",require("./routes/orderQualification"))
+app.use("/api/captal/orderFinance",require("./routes/orderFinance"))
 app.use("/api/captal/user",require("./routes/user"))
 // app.use("/api/captal/matrial",require("./routes/matrialsOrder"))
 

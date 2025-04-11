@@ -23,8 +23,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      length: 10,
       unique: true,
+      validate: {
+        validator: v => /^[0-9]{10}$/.test(v),
+        message: props => `${props.value} is not a valid 10-digit phone number!`,
+      }
     },
     email: {
       type: String,
@@ -45,13 +48,6 @@ const userSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-    attachedFile: {
-      type:Object,
-      default: {
-        publicId: null,
-        url: ""
-        }
-    },
     otp: {
       type: String,
       length: 6
@@ -63,9 +59,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["admin", "contractor", "recourse"],
     },
-    // verfied: {
-      
-    // },
   },
   {
     timestamps : true,
@@ -76,7 +69,7 @@ function validationLoginAndCreateUser(obj) {
   const schema = Joi.object({
     firstName: Joi.string().trim().min(3).max(100).required(),
     lastName: Joi.string().trim().min(3).max(100).required(),
-    phone: Joi.string().trim().length(10).required(),
+    phone: Joi.string().pattern(/^[0-9]{10}$/).required(),
     companyName: Joi.string().trim().min(3).max(100).required(),
     DateOfCompany: Joi.date().required(),
     email: Joi.string().trim().min(3).max(100).required().email(),
@@ -88,7 +81,7 @@ function validationLoginAndCreateUser(obj) {
 // validation Login User
 function validationLoginUser(obj) {
   const schema = Joi.object({
-    phone: Joi.string().trim().length(10).required(),
+    phone: Joi.string().pattern(/^[0-9]{10}$/).required()
   });
   return schema.validate(obj);
 }
@@ -103,24 +96,6 @@ function validationUpdateUser(obj) {
   return schema.validate(obj);
 }
 
-// Validate Code
-function validateCode(obj) {
-  const schema = Joi.object({
-    code: Joi.number().min(6).required(),
-  });
-  return schema.validate(obj);
-}
-
-// Generate token
-userSchema.methods.generateAuthToken = function () {
-  return jwt.sign({ id: this._id }, process.env.SECRET_KEY);
-};
-
-// Generate OTP
-function generateOTP() {
-  return crypto.randomInt(100000, 999999).toString();
-}
-
 // User model
 
 const User = mongoose.model("User", userSchema);
@@ -128,7 +103,5 @@ module.exports = {
   User,
   validationLoginAndCreateUser,
   validationUpdateUser,
-  validateCode,
-  generateOTP,
   validationLoginUser
 };

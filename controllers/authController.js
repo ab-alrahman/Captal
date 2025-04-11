@@ -28,11 +28,7 @@ const sendOTP = asyncHandler(
     let user = await User.findOne({ phone });
   
     if (!user) {
-      user = await User.create({ phone, otp, expiresAt });
-    } else {
-      user.otp = otp;
-      user.expiresAt = expiresAt;
-      await user.save();
+      return res.status(404).json({ message: 'رقم الهاتف غير مسجل لدينا' });
     }
   
     console.log(`📲 OTP for ${phone}: ${otp}`);
