@@ -12,7 +12,10 @@ connectToDb();
 const app = express()
 
 //Cors Policy
-app.use(cors())
+app.use(cors({
+  origin: "*",
+  credentials: true 
+}))
 
 //Apply Middlewares    
 app.use(express.json())
