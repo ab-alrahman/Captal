@@ -5,8 +5,8 @@ const validId = require('../middlewares/validateId');
 const {createMaterialOrder,deleteMatrialOrder,getAllMaterialsOrder,getMaterialOrderByID,updateMaterialOrder,updateStatus} = require('../controllers/martrialOrderController')
 
 // api/captal/material
-router.route("/").get(verifyToken,getAllMaterialsOrder).post(verifyToken,createMaterialOrder)
+router.route("/").get(getAllMaterialsOrder).post(createMaterialOrder)
 // api/captal/material/:id
-router.route("/:id").get(verifyToken,validId,getMaterialOrderByID).put(verifyToken,validId,updateMaterialOrder).delete(verifyToken,validId,deleteMatrialOrder)
+router.route("/:id").get(validId,getMaterialOrderByID).put(validId,updateMaterialOrder).delete(validId,deleteMatrialOrder)
 
 module.exports = router

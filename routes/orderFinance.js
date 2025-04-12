@@ -4,13 +4,13 @@ const { verifyToken,verifyUser} = require("../middlewares/verifyToken");
 const validId = require('../middlewares/validateId');
 const {getAllOrderFinance,createOrderFinance,deleteOrderFinance,getOrderFinanceById,updateOrderFinance,updateStatus} = require("../controllers/orderFinanceController")
 // /api/captal/orderFinance
-router.route("/").post(verifyToken,createOrderFinance).get(verifyToken,getAllOrderFinance)
+router.route("/").post(createOrderFinance).get(getAllOrderFinance)
 
 // /api/captal/orderFinance/:id
-router.route("/:id").put(verifyToken,validId, updateOrderFinance).delete(verifyToken,validId, deleteOrderFinance).get(verifyToken,validId, getOrderFinanceById); 
+router.route("/:id").put(validId, updateOrderFinance).delete(validId, deleteOrderFinance).get(validId, getOrderFinanceById); 
 
 // /api/captal/orderFinance/status/:id
-router.route("/status/:id").patch(verifyToken, validId, updateStatus)
+router.route("/status/:id").patch( validId, updateStatus)
 
 
 module.exports = router

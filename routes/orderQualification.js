@@ -6,13 +6,13 @@ const validId = require('../middlewares/validateId');
 
 
 // api/captal/orderQualification
-router.route("/").post(verifyToken, createOrderQualification).get(verifyToken,getAllOrderQualifications);
+router.route("/").post(createOrderQualification).get(getAllOrderQualifications);
 
 // /api/captal/orderQualification/:id
-router.route("/:id").put(verifyToken,validId, updateOrderQualification).delete(verifyToken,validId, deleteOrderQualification).get(verifyToken,validId, getOrderQualificationById); 
+router.route("/:id").put(validId, updateOrderQualification).delete(validId, deleteOrderQualification).get(validId, getOrderQualificationById); 
 
 // /api/captal/orderQualification/status/:id
-router.route("/status/:id").patch(verifyToken, validId, updateStatus)
+router.route("/status/:id").patch( validId, updateStatus)
 
 
 
