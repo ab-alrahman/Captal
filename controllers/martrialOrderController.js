@@ -121,7 +121,7 @@ module.exports.updateMaterialOrder = asyncHandler(async (req, res) => {
 /**
  * @desc Delete Matrial Order
  * @route /api/captal/material/:id
- * @method DELETE
+ * @method DELETEx
  * @access private 
  */
 module.exports.deleteMatrialOrder = asyncHandler(async (req, res) => {

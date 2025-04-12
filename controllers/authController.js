@@ -30,7 +30,10 @@ const sendOTP = asyncHandler(async (req, res) => {
 
   console.log(`📲 OTP for ${phone}: ${otp}`);
 
-  res.status(200).json({ message: 'تم إرسال كود التحقق بنجاح' });
+  res.status(200).json({
+    message: 'تم إرسال كود التحقق بنجاح',
+    user: user._id
+  });
 });
 
 /**
@@ -39,9 +42,9 @@ const sendOTP = asyncHandler(async (req, res) => {
  * @access Public
  */
 const verifyOTP = asyncHandler(async (req, res) => {
-  const { phone, otp } = req.body;
+  const { otp } = req.body;
 
-  const user = await User.findOne({ phone });
+  const user = await User.findById({ id: req.params.id });
   if (!user || user.otp !== otp) {
     return res.status(400).json({ message: 'كود التحقق غير صحيح' });
   }

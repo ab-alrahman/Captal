@@ -28,7 +28,10 @@ app.use("/api/captal/orderQualification",require("./routes/orderQualification"))
 app.use("/api/captal/orderFinance",require("./routes/orderFinance"))
 app.use("/api/captal/user",require("./routes/user"))
 app.use("/api/captal/material",require("./routes/matrialsOrder"))
-
+app.get("/api/captal/get-cookies", (req, res) => {
+  const myCookie = req.cookies.token;
+  res.json({cookieValue: myCookie})
+});
 
 // Error Handler middlewares
 app.use(notFound)
