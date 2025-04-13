@@ -59,7 +59,7 @@ const orderSchema = new mongoose.Schema({
     publicId: { type: String, default: null },
     url: { type: String, default: "" }
   },
-  status: {
+  statusOrder: {
     type: String,
     enum: ["accepted", "not accepted", "pending"],
     default: "pending"
@@ -103,7 +103,7 @@ function validationUpdateOrderQualification(obj) {
     dateOfCompany: Joi.date(),
     lastYearRevenue: Joi.string(),
     requiredAmount: Joi.string(),
-    status: Joi.string().valid("Accepted", "Not Accepted", "Pending"),
+    statusOrder: Joi.string().valid("accepted", "not accepted", "pending"),
     description: Joi.string()
   });
   return schema.validate(obj);

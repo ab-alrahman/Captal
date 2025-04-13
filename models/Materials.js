@@ -32,11 +32,6 @@ const matrialSchema = new mongoose.Schema({
     enum: ["accepted", "not accepted", "pending"],
     default: "pending"
   },
-  statusUser: {
-    type: String,
-    enum: ["visited", "eligible"], // visited = زائر، eligible = مسجل دخول
-    default: "visited"
-  },
   categories: {
     type: [String],
     required: true,

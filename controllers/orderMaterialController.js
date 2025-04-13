@@ -1,78 +1,69 @@
 const asyncHandler = require("express-async-handler");
 const upload = require("../middlewares/photoUpload");
-const { OrderFinance, validationOrderFinance, validationUpdateOrderFinance } = require("../models/OrderFinance");
-const { cloudinaryRemoveImage } = require("../utils/cloudinary");
+const { MaterialsOrder, validateCreateMatrialOrder, validateUpdateMatrialOrder } = require("../models/OrderMaterial");
+const { validationUpdateMatrialsOrder } = require("../models/Materials");
 
 
-// @desc    Create Order Finance
-// @route   POST => /api/captal/orderFinance
+// @desc    Create Order Material
+// @route   POST /api/captal/orderMaterial
 // @access  Private
-
-
-module.exports.createOrderFinance = [
+module.exports.createOrderMaterial = [
   upload,
   asyncHandler(async (req, res) => {
-    const { error } = validationOrderFinance(req.body);
+    const { error } = validateCreateMatrialOrder(req.body);
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
-
-    const existingUser = await User.findOne({ phone: req.body.phone });
-
-    const statusUser = existingUser ? "eligible" : "visited";
-    const userId = existingUser ? existingUser._id : null;
 
     const uploadedFile = req.file
       ? { url: req.file.path, publicId: req.file.filename }
       : { url: "", publicId: null };
 
-    const order = await OrderQualification.create({
+    const materialOrder = await MaterialsOrder.create({
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       phone: req.body.phone,
       email: req.body.email,
       companyName: req.body.companyName,
       dateOfCompany: req.body.dateOfCompany,
-      lastYearRevenue: req.body.lastYearRevenue,
-      requiredAmount: req.body.requiredAmount,
+      materials: req.body.materials,
+      noteForQuantity: req.body.noteForQuantity,
       description: req.body.description,
       attachedFile: uploadedFile,
-      statusUser,
-      userId,
     });
 
-    res.status(201).json({ message: "تم إنشاء طلب التمويل بنجاح", order });
+    res.status(201).json({ message: "Order created successfully", materialOrder });
   }),
 ];
 
-// @desc    Get Order Finance
-// @route   GET => /api/captal/orderFinance
+
+// @desc    Get Order Material
+// @route   GET /api/captal/orderMaterial
 // @access  Private
 
-module.exports.getAllOrderFinance = asyncHandler(async (req, res) => {
-  const orders = await OrderFinance.find();
+module.exports.getAllOrderMaterials = asyncHandler(async (req, res) => {
+  const orders = await MaterialsOrder.find();
   res.status(200).json(orders);
 });
 
-// @desc    Get Order Finance By ID
-// @route   GET /api/captal/orderFinance/:id
-// @access  Private    
+// @desc    Get Order Material By ID
+// @route   GET /api/captal/orderMaterial
+// @access  Private
 
-module.exports.getOrderFinanceById = asyncHandler(async (req, res) => {
-  const order = await OrderFinance.findById(req.params.id);
+module.exports.getOrderMaterialById = asyncHandler(async (req, res) => {
+  const order = await MaterialsOrder.findById(req.params.id);
   if (!order) return res.status(404).json({ message: "Order not found" });
   res.status(200).json(order);
 });
 
-// @desc    Update Order Finance By ID
-// @route   PUT /api/captal/orderFinance/:id
+// @desc    Update Order Material By ID
+// @route   PUT /api/captal/orderMaterial/:id
 // @access  Private
 
-
-module.exports.updateOrderFinance = [
+module.exports.updateOrderMaterial = [
   upload,
   asyncHandler(async (req, res) => {
-    const { error } = validationUpdateOrderFinance(req.body);
+    const { error } = validateUpdateMatrialOrder(req.body);
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
@@ -80,10 +71,6 @@ module.exports.updateOrderFinance = [
     const order = await OrderFinance.findById(req.params.id);
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
-    }
-
-    if (order.userId && order.userId.toString() !== req.user.id) {
-      return res.status(403).json({ message: "You are not allowed to update this order" });
     }
 
     let updatedFile = order.attachedFile;
@@ -105,8 +92,8 @@ module.exports.updateOrderFinance = [
       email: req.body.email || order.email,
       companyName: req.body.companyName || order.companyName,
       dateOfCompany: req.body.dateOfCompany || order.dateOfCompany,
-      lastYearRevenue: req.body.lastYearRevenue || order.lastYearRevenue,
-      requiredAmount: req.body.requiredAmount || order.requiredAmount,
+      materials: req.body.materials || order.materials,
+      noteForQuantity: req.body.noteForQuantity || order.noteForQuantity,
       statusOrder: req.body.statusOrder || order.statusOrder,
       description: req.body.description || order.description,
       attachedFile: updatedFile,
@@ -125,31 +112,31 @@ module.exports.updateOrderFinance = [
   }),
 ];
 
-// @desc    Delete Order Finance
-// @route   DELETE /api/captal/orderFinance/:id
-// @access  Private 
-module.exports.deleteOrderFinance = asyncHandler(async (req, res) => {
-  const order = await OrderFinance.findById(req.params.id);
+
+// @desc    delete Order Material By ID
+// @route   DELETE /api/captal/orderMaterial/:id
+// @access  Private
+module.exports.deleteOrderMaterial = asyncHandler(async (req, res) => {
+  const order = await MaterialsOrder.findById(req.params.id);
   if (!order) return res.status(404).json({ message: "Order not found" });
 
-  await OrderFinance.findByIdAndDelete(req.params.id);
+  await MaterialsOrder.findByIdAndDelete(req.params.id);
   res.status(200).json({ message: "Order deleted successfully" });
 });
 
-
-// @desc    Update Order Finance Status
-// @route   PUT /api/captal/orderQualification/status/:id
+// @desc    Update Order Material Status
+// @route   PUT /api/captal/orderMaterial/status/:id
 // @access  Private (admin or specific role)
 module.exports.updateStatus = asyncHandler(async (req, res) => {
-  const { error } = validationUpdateOrderFinance(req.body);
+  const { error } = validationUpdateMatrialsOrder(req.body);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
   
-  const order = await OrderFinance.findById(req.params.id);
+  const order = await MaterialsOrder.findById(req.params.id);
   if (!order) return res.status(404).json({ message: "Order not found" });
 
-  const updatedStatus = await OrderFinance.findByIdAndUpdate(
+  const updatedStatus = await MaterialsOrder.findByIdAndUpdate(
     req.params.id,
     { $set: { statusOrder: req.body.statusOrder } },
     { new: true }
@@ -157,3 +144,4 @@ module.exports.updateStatus = asyncHandler(async (req, res) => {
 
   res.status(200).json(updatedStatus);
 });
+

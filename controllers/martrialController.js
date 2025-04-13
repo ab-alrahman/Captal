@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { validationMatrialsOrder, Materials , validationUpdateMatrialsOrder} = require("../models/MaterialsOrder");
+const { validationMatrialsOrder, Materials , validationUpdateMatrialsOrder} = require("../models/Materials");
 const upload  = require("../middlewares/photoUpload");
 
 
@@ -121,7 +121,7 @@ module.exports.updateMaterialOrder = asyncHandler(async (req, res) => {
 /**
  * @desc Delete Matrial Order
  * @route /api/captal/material/:id
- * @method DELETEx
+ * @method DELETE
  * @access private 
  */
 module.exports.deleteMatrialOrder = asyncHandler(async (req, res) => {

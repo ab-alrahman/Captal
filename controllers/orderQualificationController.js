@@ -1,10 +1,10 @@
 const asyncHandler = require("express-async-handler");
+const upload  = require("../middlewares/photoUpload");
 const {
   validationOrderQualification,
   validationUpdateOrderQualification,
   OrderQualification,
 } = require("../models/OrderQualification");
-const upload  = require("../middlewares/photoUpload");
 
 // @desc    Create Order Qualification
 // @route   POST /api/captal/orderQualification
@@ -117,7 +117,7 @@ module.exports.updateStatus = asyncHandler(async (req, res) => {
 
   const updatedStatus = await OrderQualification.findByIdAndUpdate(
     req.params.id,
-    { $set: { status: req.body.status } },
+    { $set: { statusOrder: req.body.statusOrder } },
     { new: true }
   );
 
