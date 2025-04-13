@@ -52,7 +52,7 @@ const orderSchema = new mongoose.Schema({
     required: true
   },
   requiredAmount: {
-    type: Number,
+    type: String,
     required: true
   },
   attachedFile: {
@@ -92,7 +92,7 @@ function validationOrderFinance(obj) {
     companyName: Joi.string().trim().min(3).max(100).required(),
     dateOfCompany: Joi.date().required(),
     lastYearRevenue: Joi.string().required(),
-    requiredAmount: Joi.number().required(),
+    requiredAmount: Joi.string().required(),
     description: Joi.string().optional()
   });
   return schema.validate(obj);

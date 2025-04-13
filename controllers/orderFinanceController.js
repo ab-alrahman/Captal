@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const upload = require("../middlewares/photoUpload");
 const { OrderFinance, validationOrderFinance, validationUpdateOrderFinance } = require("../models/OrderFinance");
 const { cloudinaryRemoveImage } = require("../utils/cloudinary");
+const { User } = require("../models/User");
 
 
 // @desc    Create Order Finance
